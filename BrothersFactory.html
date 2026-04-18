@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brothers Factory's</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
+.hdr{background:#D85A30;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.logo{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.hdr h1{font-size:16px;font-weight:600;flex:1}
+.hdr .who{font-size:12px;opacity:.85}
+.nav{display:flex;background:#fff;border-bottom:1px solid #e5e5e5;overflow-x:auto;position:sticky;top:62px;z-index:9}
+.nav button{flex:1;min-width:80px;padding:12px 8px;border:none;background:none;font-size:13px;color:#666;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.nav button.on{color:#D85A30;border-bottom-color:#D85A30;font-weight:600}
+.page{display:none;padding:16px}
+.page.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.cards.four{grid-template-columns:repeat(2,1fr)}
+.mc{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.mc .lbl{font-size:11px;color:#888;margin-bottom:4px}
+.mc .val{font-size:22px;font-weight:700;color:#1a1a1a}
+.mc .val.g{color:#1D9E75}
+.mc .val.r{color:#E24B4A}
+.mc .val.o{color:#BA7517}
+.section{background:#fff;border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.section h3{font-size:14px;font-weight:600;margin-bottom:12px;color:#1a1a1a}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:#666;margin-bottom:4px;font-weight:500}
+.field input,.field select{width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a;-webkit-appearance:none}
+.field input:focus,.field select:focus{outline:none;border-color:#D85A30}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{font-size:11px;color:#888;margin-top:6px;padding:8px 10px;background:#fff8f5;border-radius:6px;border-left:3px solid #D85A30}
+.btn-main{width:100%;padding:14px;background:#D85A30;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.btn-main:active{background:#993C1D}
+.btn-main:disabled{background:#ccc;cursor:not-allowed}
+.btn-sec{width:100%;padding:11px;background:#fff;color:#D85A30;border:1.5px solid #D85A30;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.dep-row{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.dep-row:last-child{border-bottom:none}
+.dep-info{flex:1}
+.dep-cat{font-size:11px;color:#888}
+.dep-lib{font-size:13px;font-weight:500}
+.dep-mt{font-size:14px;font-weight:700;color:#E24B4A;white-space:nowrap}
+.dep-del{background:none;border:none;color:#ccc;font-size:18px;padding:0 4px;cursor:pointer}
+.empty{text-align:center;color:#bbb;font-size:13px;padding:20px 0}
+.setup-box{background:#fff8f5;border:1.5px solid #D85A30;border-radius:12px;padding:16px;margin-bottom:16px}
+.setup-box h3{font-size:14px;font-weight:600;color:#D85A30;margin-bottom:8px}
+.setup-box p{font-size:13px;color:#555;line-height:1.6}
+.setup-box input{width:100%;padding:10px;border:1px solid #e0e0e0;border-radius:8px;font-size:13px;margin-top:10px}
+.badge-who{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;margin-left:6px}
+.hist-row{padding:10px 0;border-bottom:1px solid #f0f0f0}
+.hist-row:last-child{border-bottom:none}
+.hist-date{font-size:12px;color:#888}
+.hist-vals{display:flex;gap:12px;margin-top:4px;flex-wrap:wrap}
+.hist-val{font-size:12px;color:#555}
+.hist-val span{font-weight:600;color:#1a1a1a}
+.sync-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#f0faf5;border-radius:8px;margin-bottom:14px;font-size:12px;color:#1D9E75}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#1D9E75;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">BF</div>
+  <h1>Brothers Factory's</h1>
+  <div class="who" id="hdr-who"></div>
+</div>
+
+<div class="nav">
+  <button class="on" onclick="goPage('saisie',this)">Saisie</button>
+  <button onclick="goPage('semaine',this)">Semaine</button>
+  <button onclick="goPage('mois',this)">Mois</button>
+  <button onclick="goPage('depenses',this)">Dépenses</button>
+  <button onclick="goPage('config',this)">Config</button>
+</div>
+
+<div id="pg-saisie" class="page on">
+  <div id="no-config-warn" class="setup-box" style="display:none">
+    <h3>Configuration requise</h3>
+    <p>Va dans l'onglet <strong>Config</strong> et entre ton prénom pour commencer.</p>
+  </div>
+
+  <div class="section">
+    <h3>Date</h3>
+    <div class="field"><input type="date" id="cur-date"></div>
+  </div>
+
+  <div class="section">
+    <h3>Recettes du jour</h3>
+    <div class="row2">
+      <div class="field"><label>Espèces (€)</label><input type="number" id="v-esp" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+      <div class="field"><label>Carte bancaire (€)</label><input type="number" id="v-cb" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>SumUp (€)</label><input type="number" id="v-sum" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+      <div class="field"><label>Autre appli (€)</label><input type="number" id="v-app" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Deliveroo brut (€)</label><input type="number" id="v-del" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+      <div class="field"><label>Uber Eats brut (€)</label><input type="number" id="v-ube" placeholder="0" min="0" step="0.01" inputmode="decimal" oninput="calcDay()"></div>
+    </div>
+    <div class="note">Deliveroo, Uber Eats & autre appli : commission 36% déduite automatiquement</div>
+  </div>
+
+  <div class="cards">
+    <div class="mc"><div class="lbl">CA brut</div><div class="val" id="d-brut">0,00 €</div></div>
+    <div class="mc"><div class="lbl">Commission livraison</div><div class="val r" id="d-comm">0,00 €</div></div>
+    <div class="mc"><div class="lbl">CA net</div><div class="val" id="d-canet">0,00 €</div></div>
+    <div class="mc"><div class="lbl">Bénéfice estimé</div><div class="val g" id="d-ben">0,00 €</div></div>
+  </div>
+
+  <div class="section">
+    <h3>Dépenses du jour</h3>
+    <div class="row2">
+      <div class="field"><label>Catégorie</label>
+        <select id="dep-cat">
+          <option value="Fournisseur">Fournisseur</option>
+          <option value="Loyer">Loyer</option>
+          <option value="Salaire">Salaire</option>
+          <option value="Énergie">Énergie</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="field"><label>Montant (€)</label><input type="number" id="dep-mt" placeholder="0" min="0" step="0.01" inputmode="decimal"></div>
+    </div>
+    <div class="field"><label>Libellé</label><input type="text" id="dep-lib" placeholder="ex: Metro, Brake, EDF..."></div>
+    <button class="btn-sec" onclick="addDep()">+ Ajouter une dépense</button>
+    <div id="dep-list" style="margin-top:12px"></div>
+  </div>
+
+  <button class="btn-main" id="btn-save" onclick="saveDay()">Enregistrer dans Google Sheets</button>
+</div>
+
+<div id="pg-semaine" class="page">
+  <div id="sync-bar-sem" class="sync-bar" style="display:none"><div class="sync-dot"></div><span id="sync-txt-sem">Chargement...</span></div>
+  <div class="cards four" id="sem-cards">
+    <div class="mc"><div class="lbl">CA net 7j</div><div class="val" id="s-ca">—</div></div>
+    <div class="mc"><div class="lbl">Dépenses 7j</div><div class="val r" id="s-dep">—</div></div>
+    <div class="mc"><div class="lbl">Bénéfice 7j</div><div class="val g" id="s-ben">—</div></div>
+    <div class="mc"><div class="lbl">Livraison net 7j</div><div class="val o" id="s-liv">—</div></div>
+  </div>
+  <div class="section">
+    <h3>Détail par jour — 7 derniers jours</h3>
+    <div id="sem-hist"><div class="empty">Chargement...</div></div>
+  </div>
+</div>
+
+<div id="pg-mois" class="page">
+  <div id="sync-bar-mois" class="sync-bar" style="display:none"><div class="sync-dot"></div><span id="sync-txt-mois">Chargement...</span></div>
+  <div class="cards four">
+    <div class="mc"><div class="lbl">CA net du mois</div><div class="val" id="m-ca">—</div></div>
+    <div class="mc"><div class="lbl">Dépenses du mois</div><div class="val r" id="m-dep">—</div></div>
+    <div class="mc"><div class="lbl">Bénéfice du mois</div><div class="val g" id="m-ben">—</div></div>
+    <div class="mc"><div class="lbl">Jours enregistrés</div><div class="val" id="m-jours">—</div></div>
+  </div>
+  <div class="section">
+    <h3>Meilleure journée du mois</h3>
+    <div id="best-day"><div class="empty">—</div></div>
+  </div>
+  <div class="section">
+    <h3>Historique du mois</h3>
+    <div id="mois-hist"><div class="empty">Chargement...</div></div>
+  </div>
+</div>
+
+<div id="pg-depenses" class="page">
+  <div class="cards">
+    <div class="mc"><div class="lbl">Total dépenses</div><div class="val r" id="dep-total">—</div></div>
+    <div class="mc"><div class="lbl">Ce mois</div><div class="val r" id="dep-mois">—</div></div>
+  </div>
+  <div class="section">
+    <h3>Par catégorie (tout)</h3>
+    <div id="dep-cats"><div class="empty">Chargement...</div></div>
+  </div>
+  <div class="section">
+    <h3>Historique complet</h3>
+    <div id="dep-hist-all"><div class="empty">Chargement...</div></div>
+  </div>
+</div>
+
+<div id="pg-config" class="page">
+  <div class="section">
+    <h3>Ton prénom</h3>
+    <div class="field">
+      <label>Prénom affiché dans le Sheet</label>
+      <input type="text" id="cfg-nom" placeholder="ex: Mohamed, Karim, Youssef...">
+    </div>
+    <button class="btn-main" onclick="saveConfig()">Enregistrer</button>
+  </div>
+  <div class="section" style="margin-top:14px">
+    <h3>Connexion Google Sheets</h3>
+    <p style="font-size:13px;color:#888;margin-bottom:10px">URL du script Apps Script</p>
+    <div class="field"><input type="text" id="cfg-url" placeholder="https://script.google.com/..."></div>
+    <button class="btn-main" onclick="saveConfig()">Enregistrer</button>
+  </div>
+  <div class="section" style="margin-top:14px;background:#f9f9f9">
+    <p style="font-size:12px;color:#aaa;text-align:center">Brothers Factory's — Dashboard v1.0</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtLy4nd4StPKIk0aph-6N2-884ieE5d9tRWspuL0MZEHA7PuIfiKJHLoxOVhOUEcfW/exec";
+const COMM = 0.36;
+let curDeps = [];
+let sheetData = null;
+
+function getConfig() {
+  return {
+    nom: localStorage.getItem('bf_nom') || '',
+    url: localStorage.getItem('bf_url') || SCRIPT_URL
+  };
+}
+
+function saveConfig() {
+  const nom = document.getElementById('cfg-nom').value.trim();
+  const url = document.getElementById('cfg-url').value.trim() || SCRIPT_URL;
+  localStorage.setItem('bf_nom', nom);
+  localStorage.setItem('bf_url', url);
+  document.getElementById('hdr-who').textContent = nom ? nom : '';
+  showToast('Configuration enregistrée !');
+}
+
+function initConfig() {
+  const cfg = getConfig();
+  document.getElementById('cfg-nom').value = cfg.nom;
+  document.getElementById('cfg-url').value = cfg.url;
+  document.getElementById('hdr-who').textContent = cfg.nom || '';
+  if (!cfg.nom) document.getElementById('no-config-warn').style.display = 'block';
+}
+
+function fmt(v) {
+  return parseFloat(v || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+function calcDay() {
+  const esp = parseFloat(document.getElementById('v-esp').value) || 0;
+  const cb  = parseFloat(document.getElementById('v-cb').value)  || 0;
+  const sum = parseFloat(document.getElementById('v-sum').value) || 0;
+  const del = parseFloat(document.getElementById('v-del').value) || 0;
+  const ube = parseFloat(document.getElementById('v-ube').value) || 0;
+  const app = parseFloat(document.getElementById('v-app').value) || 0;
+  const brut = esp + cb + sum + del + ube + app;
+  const comm = (del + ube + app) * COMM;
+  const canet = brut - comm;
+  const deps = curDeps.reduce((a, d) => a + d.mt, 0);
+  const ben = canet - deps;
+  document.getElementById('d-brut').textContent = fmt(brut);
+  document.getElementById('d-comm').textContent = fmt(comm);
+  document.getElementById('d-canet').textContent = fmt(canet);
+  const bEl = document.getElementById('d-ben');
+  bEl.textContent = fmt(ben);
+  bEl.className = 'val ' + (ben >= 0 ? 'g' : 'r');
+}
+
+function addDep() {
+  const cat = document.getElementById('dep-cat').value;
+  const lib = document.getElementById('dep-lib').value.trim() || cat;
+  const mt  = parseFloat(document.getElementById('dep-mt').value) || 0;
+  if (mt <= 0) { showToast('Entre un montant valide'); return; }
+  curDeps.push({ cat, lib, mt });
+  document.getElementById('dep-lib').value = '';
+  document.getElementById('dep-mt').value = '';
+  renderDepList();
+  calcDay();
+}
+
+function delDep(i) {
+  curDeps.splice(i, 1);
+  renderDepList();
+  calcDay();
+}
+
+function renderDepList() {
+  const el = document.getElementById('dep-list');
+  if (!curDeps.length) { el.innerHTML = ''; return; }
+  el.innerHTML = curDeps.map((d, i) => `
+    <div class="dep-row">
+      <div class="dep-info">
+        <div class="dep-cat">${d.cat}</div>
+        <div class="dep-lib">${d.lib}</div>
+      </div>
+      <div class="dep-mt">${fmt(d.mt)}</div>
+      <button class="dep-del" onclick="delDep(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+async function saveDay() {
+  const cfg = getConfig();
+  if (!cfg.nom) { showToast('Entre ton prénom dans Config d\'abord'); goPage('config', document.querySelectorAll('.nav button')[4]); return; }
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+  const date = document.getElementById('cur-date').value;
+  const esp = parseFloat(document.getElementById('v-esp').value) || 0;
+  const cb  = parseFloat(document.getElementById('v-cb').value)  || 0;
+  const sum = parseFloat(document.getElementById('v-sum').value) || 0;
+  const del = parseFloat(document.getElementById('v-del').value) || 0;
+  const ube = parseFloat(document.getElementById('v-ube').value) || 0;
+  const app = parseFloat(document.getElementById('v-app').value) || 0;
+  if (esp + cb + sum + del + ube + app === 0 && curDeps.length === 0) {
+    showToast('Rien à enregistrer'); btn.disabled = false; btn.textContent = 'Enregistrer dans Google Sheets'; return;
+  }
+  const deps = curDeps.reduce((a, d) => a + d.mt, 0);
+  const rows = [{ date, esp, cb, sum, del, ube, app, deps, saispar: cfg.nom }];
+  try {
+    await fetch(cfg.url, { method: 'POST', body: JSON.stringify({ rows }), headers: { 'Content-Type': 'application/json' } });
+    showToast('Enregistré dans Google Sheets !');
+    ['v-esp','v-cb','v-sum','v-del','v-ube','v-app'].forEach(id => document.getElementById(id).value = '');
+    curDeps = []; renderDepList(); calcDay();
+    sheetData = null;
+  } catch(err) {
+    showToast('Erreur de connexion, réessaie');
+  }
+  btn.disabled = false; btn.textContent = 'Enregistrer dans Google Sheets';
+}
+
+async function loadData() {
+  if (sheetData) return sheetData;
+  const cfg = getConfig();
+  try {
+    const r = await fetch(cfg.url);
+    const j = await r.json();
+    sheetData = j.rows || [];
+    return sheetData;
+  } catch(e) { return []; }
+}
+
+function parseDate(d) {
+  if (!d) return null;
+  const s = String(d);
+  if (s.includes('-')) return new Date(s + 'T12:00:00');
+  if (s.includes('/')) { const [a,b,c] = s.split('/'); return new Date(`${c}-${b}-${a}T12:00:00`); }
+  return new Date(s);
+}
+
+async function renderSemaine() {
+  document.getElementById('sync-bar-sem').style.display = 'flex';
+  document.getElementById('sync-txt-sem').textContent = 'Synchronisation...';
+  const rows = await loadData();
+  document.getElementById('sync-bar-sem').style.display = 'none';
+  const now = new Date(); now.setHours(12,0,0,0);
+  const d7 = new Date(now); d7.setDate(d7.getDate() - 6);
+  const week = rows.filter(r => { const d = parseDate(r['Date']); return d && d >= d7 && d <= now; });
+  const canet = week.reduce((a,r) => a + (parseFloat(r['CA net'])||0), 0);
+  const deps  = week.reduce((a,r) => a + (parseFloat(r['Dépenses'])||0), 0);
+  const ben   = week.reduce((a,r) => a + (parseFloat(r['Bénéfice'])||0), 0);
+  const liv   = week.reduce((a,r) => a + ((parseFloat(r['Deliveroo brut'])||0)+(parseFloat(r['Uber Eats brut'])||0)+(parseFloat(r['Autre appli'])||0))*(1-COMM), 0);
+  document.getElementById('s-ca').textContent  = fmt(canet);
+  document.getElementById('s-dep').textContent = fmt(deps);
+  const bEl = document.getElementById('s-ben'); bEl.textContent = fmt(ben); bEl.className = 'val ' + (ben >= 0 ? 'g' : 'r');
+  document.getElementById('s-liv').textContent = fmt(liv);
+  const hist = document.getElementById('sem-hist');
+  if (!week.length) { hist.innerHTML = '<div class="empty">Aucune donnée cette semaine</div>'; return; }
+  const sorted = [...week].sort((a,b) => String(b['Date']).localeCompare(String(a['Date'])));
+  hist.innerHTML = sorted.map(r => `
+    <div class="hist-row">
+      <div class="hist-date">${parseDate(r['Date']).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'short'})} — <strong>${r['Saisi par']||'?'}</strong></div>
+      <div class="hist-vals">
+        <div class="hist-val">CA net <span>${fmt(r['CA net'])}</span></div>
+        <div class="hist-val">Dépenses <span style="color:#E24B4A">${fmt(r['Dépenses'])}</span></div>
+        <div class="hist-val">Bénéfice <span style="color:${parseFloat(r['Bénéfice'])>=0?'#1D9E75':'#E24B4A'}">${fmt(r['Bénéfice'])}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+async function renderMois() {
+  document.getElementById('sync-bar-mois').style.display = 'flex';
+  document.getElementById('sync-txt-mois').textContent = 'Synchronisation...';
+  const rows = await loadData();
+  document.getElementById('sync-bar-mois').style.display = 'none';
+  const now = new Date();
+  const mois = rows.filter(r => { const d = parseDate(r['Date']); return d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); });
+  const canet = mois.reduce((a,r) => a+(parseFloat(r['CA net'])||0),0);
+  const deps  = mois.reduce((a,r) => a+(parseFloat(r['Dépenses'])||0),0);
+  const ben   = mois.reduce((a,r) => a+(parseFloat(r['Bénéfice'])||0),0);
+  document.getElementById('m-ca').textContent   = fmt(canet);
+  document.getElementById('m-dep').textContent  = fmt(deps);
+  const mEl = document.getElementById('m-ben'); mEl.textContent = fmt(ben); mEl.className = 'val '+(ben>=0?'g':'r');
+  document.getElementById('m-jours').textContent = mois.length;
+  let best = mois.reduce((a,r) => (parseFloat(r['CA net'])||0)>(parseFloat(a['CA net'])||0)?r:a, mois[0]);
+  document.getElementById('best-day').innerHTML = best ? `
+    <div class="hist-row">
+      <div class="hist-date">${parseDate(best['Date']).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}</div>
+      <div class="hist-vals">
+        <div class="hist-val">CA net <span>${fmt(best['CA net'])}</span></div>
+        <div class="hist-val">Bénéfice <span style="color:#1D9E75">${fmt(best['Bénéfice'])}</span></div>
+      </div>
+    </div>` : '<div class="empty">—</div>';
+  const hist = document.getElementById('mois-hist');
+  if (!mois.length) { hist.innerHTML = '<div class="empty">Aucune donnée ce mois</div>'; return; }
+  const sorted = [...mois].sort((a,b) => String(b['Date']).localeCompare(String(a['Date'])));
+  hist.innerHTML = sorted.map(r => `
+    <div class="hist-row">
+      <div class="hist-date">${parseDate(r['Date']).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})} — <strong>${r['Saisi par']||'?'}</strong></div>
+      <div class="hist-vals">
+        <div class="hist-val">CA net <span>${fmt(r['CA net'])}</span></div>
+        <div class="hist-val">Dépenses <span style="color:#E24B4A">${fmt(r['Dépenses'])}</span></div>
+        <div class="hist-val">Bénéfice <span style="color:${parseFloat(r['Bénéfice'])>=0?'#1D9E75':'#E24B4A'}">${fmt(r['Bénéfice'])}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+async function renderDepenses() {
+  const rows = await loadData();
+  const allDeps = []; let total = 0; let totalMois = 0;
+  const now = new Date();
+  const cats = {};
+  rows.forEach(r => {
+    const dep = parseFloat(r['Dépenses'])||0;
+    total += dep;
+    const d = parseDate(r['Date']);
+    if (d && d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) totalMois += dep;
+  });
+  document.getElementById('dep-total').textContent = fmt(total);
+  document.getElementById('dep-mois').textContent  = fmt(totalMois);
+  document.getElementById('dep-cats').innerHTML = '<div class="empty">Détail par catégorie disponible dans le Google Sheet</div>';
+  document.getElementById('dep-hist-all').innerHTML = rows.length
+    ? [...rows].filter(r=>parseFloat(r['Dépenses'])>0).sort((a,b)=>String(b['Date']).localeCompare(String(a['Date']))).map(r=>`
+      <div class="hist-row">
+        <div class="hist-date">${parseDate(r['Date']).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})} — ${r['Saisi par']||'?'}</div>
+        <div class="hist-vals"><div class="hist-val">Dépenses <span style="color:#E24B4A">${fmt(r['Dépenses'])}</span></div></div>
+      </div>`).join('')
+    : '<div class="empty">Aucune dépense enregistrée</div>';
+}
+
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  btn.classList.add('on');
+  sheetData = null;
+  if (id === 'semaine')  renderSemaine();
+  if (id === 'mois')     renderMois();
+  if (id === 'depenses') renderDepenses();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+document.getElementById('cur-date').value = new Date().toISOString().slice(0,10);
+initConfig();
+</script>
+</body>
+</html>
